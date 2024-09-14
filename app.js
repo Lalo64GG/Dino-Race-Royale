@@ -1,17 +1,25 @@
+import { createModalConfiguration } from "./src/components/modal.js";
+
 let workerObstaculos;
 let workerNubes;
+let highScore;
 
-let highScore = localStorage.getItem('highScore');
+if(!localStorage.getItem("highscore") !== null){
+    highScore = localStorage.getItem('highScore');
+}
 
-function InitWorkers() {
-    workerObstaculos = new Worker('../workers/obstaculosWorker.js');
+let modal = document.getElementById("modal");
+let modalContent = document.getElementById("modal-content");
+
+const InitWorkers = () => {
+    workerObstaculos = new Worker('../src/workers/obstaculosWorker.js');
     workerObstaculos.onmessage = function (e) {
         if (e.data.action === 'crearObstaculo') {
             CrearObstaculo();
         }
     };
 
-    workerNubes = new Worker('../workers/nubesWorker.js');
+    workerNubes = new Worker('../src/workers/nubesWorker.js');
     workerNubes.onmessage = function (e) {
         if (e.data.action === 'crearNube') {
             CrearNube();
@@ -27,13 +35,32 @@ let gameStarted = false;
 
 document.getElementById("btn-start").addEventListener("click", () => {
     if (!gameStarted) {
-        let start = document.getElementById("presentation").style.display = "none"
-        let mostrarScore = document.getElementById("score").style.display = "block"
+        if(highScore !== null) {
+            document.getElementById("highscore").innerText = "High Score: " + highScore;
+        }
+        document.getElementById("presentation").style.display = "none"
+        document.getElementById("score").style.display = ""
         InitWorkers();
         Start();
         gameStarted = true; 
         Loop();
     }
+})
+
+document.getElementById("btn-configuration").addEventListener("click", () => {
+    document.getElementById("presentation").style.display = "none"
+    createModalConfiguration()
+})
+
+document.getElementById("btn-close").addEventListener("click", () => {
+    modal.style.display = "none";
+    document.getElementById("presentation").style.display = ""
+    modalContent.innerHTML = ""
+    
+})
+
+document.getElementById("btn-reset").addEventListener("click", () => {
+    Restart()
 })
 
 function Loop() {
@@ -45,6 +72,7 @@ function Loop() {
 }
 
 //****** GAME LOGIC ********//
+let gameVel;
 
 let sueloY = 22;
 let velY = 0;
@@ -88,12 +116,13 @@ function Start() {
     contenedor = document.querySelector(".contenedor");
     textoScore = document.querySelector(".score");
     dino = document.querySelector(".dino");
-    textoScore.innerText = score; 
+    textoScore.innerText = `Score: ${score}`; 
     document.addEventListener("keydown", HandleKeyDown);
     ResetGame();
 }
 
 function ResetGame() {
+    console.log("Resetting game")
     score = 0;
     dinoPosY = sueloY;
     velY = 0;
@@ -101,7 +130,8 @@ function ResetGame() {
     sueloX = 0;
     obstaculos = [];
     nubes = [];
-    textoScore.innerText = score;
+    textoScore.innerText = `Score: ${score}`;
+    suelo.style.left= "0px"
     dino.classList.add("dino-corriendo");
     dino.classList.remove("dino-estrellado");
     contenedor.classList.remove("mediodia", "tarde", "noche");
@@ -110,6 +140,38 @@ function ResetGame() {
         gameOver.style.display = "none"; 
     }
 }
+
+function Restart() {
+    if(score  > highScore ){
+        document.getElementById("highscore").innerText = "High Score: " + score;
+    }
+    
+    score = 0;
+    dinoPosY = sueloY;
+    velY = 0;
+    gameVel = 1;
+    sueloX = 0;
+    
+    obstaculos.forEach(obstaculo => obstaculo.remove());
+    nubes.forEach(nube => nube.remove());
+    
+    obstaculos = [];
+    nubes = [];
+    
+    textoScore.innerText = `Score: ${score}`;
+    suelo.style.left = "0px";
+    dino.classList.add("dino-corriendo");
+    dino.classList.remove("dino-estrellado");
+    contenedor.classList.remove("mediodia", "tarde", "noche");
+    
+    if (gameOver) {
+        gameOver.style.display = "none";
+    }
+    
+    parado = false;
+    Loop();
+}
+
 
 
 function Update() {
@@ -242,7 +304,7 @@ function MoverNubes() {
 
 function GanarPuntos() {
     score++;
-    textoScore.innerText = score;
+    textoScore.innerText = `Score: ${score}`;
     if(score == 5){
         gameVel = 1.5;
         contenedor.classList.add("mediodia");
@@ -258,12 +320,10 @@ function GanarPuntos() {
 
 function GameOver() {
 
-    if(highScore !== undefined) {
+    
         if(score > highScore) {
-            highScore = score;
-            localStorage.setItem("highScore", highScore);
+            document.getElementById("highscore").innerText = "High Score: " + score;
         }
-    }
 
     Estrellarse();
     gameOver.style.display = "block";

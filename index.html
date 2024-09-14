@@ -3,45 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dino Race Royale</title> 
-    <meta name="description" content="Play Dino Race Royale, a multiplayer version of the classic offline dinosaur game!" /> 
-    <link rel="icon" href="favicon.ico" type="image/x-icon" /> 
-    <link rel="stylesheet" href="styles.css" />
+    <title>Dino Race Royale</title>
+    <meta
+      name="description"
+      content="Play Dino Race Royale, a multiplayer version of the classic offline dinosaur game!"
+    />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../src/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div id="modalConfi" style="display: none;">
-      <h1>Configuration</h1>
 
-
-      <h2>Controls</h2>
-    </div>
     <div class="contenedor">
+      <div class="modal" id="modal" style="display: none">
+        <h1 id="modalTitle"></h1>
+        <button id="btn-close" class="close">X</button>
+        <div class="modal-content" id="modal-content">
+        </div>
+      </div>
       <div class="presentation" id="presentation">
         <h1>Dino Race Royale</h1>
         <div class="content">
           <button class="button" id="btn-start">Start</button>
-          <button class="button" id="btn-multiplayer">Multiplayer</button> 
+          <button class="button" id="btn-multiplayer">Multiplayer</button>
           <button class="button" id="btn-configuration">Configuration</button>
         </div>
       </div>
-    
+
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
-      <div class="score" id="score" style="display: none;">0</div>
-      <div class="score" id="highscore"></div>
-      <div class="game-over" style="display: none;">Game Over
-       <div>
-        <button class="button" onclick="ResetGame()">Restart</button>
-       </div>
+      <div class="contentScore">
+        <div class="score" id="score" style="display: none">0</div>
+        <div class="highscore" id="highscore"></div>
+      </div>
+      <div class="game-over" style="display: none">
+        Game Over
+        <div>
+          <button class="button" id="btn-reset">Restart</button>
+        </div>
       </div>
     </div>
 
     <div id="obstaculos"></div>
     <div id="nubes"></div>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
