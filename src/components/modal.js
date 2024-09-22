@@ -1,57 +1,110 @@
+import { musicConfiguration } from "./musicConfiguration.js";
+import { controllsConfiguration } from "./controllsConfiguration.js";
+import { userContent } from "./userContent.js";
+import { Loop, rival, Start } from "../gameLogic.js";
+import { initWebSocket, messageReceived, sendData } from "../initWebSocket.js";
+import { createRoom } from "../createRoom.js";
+import { dinoPosY } from "../gameLogic.js";
+import { roomContent } from "./roomContent.js";
+
 let modal = document.getElementById("modal");
 let modalTitle = document.getElementById("modalTitle");
 let modalContent = document.getElementById("modal-content");
 
 export const createModalConfiguration = () => {
-    modal.style.display = "block";   
-    modal.style.opacity = "1";       
-    modal.style.pointerEvents = "auto";
-    modal.style.padding = " 0rem 3rem"
+  modal.style.display = "block";
+  modal.style.opacity = "1";
+  modal.style.pointerEvents = "auto";
+  modalTitle.innerHTML = "Configuration";
 
-    modalTitle.innerHTML = "Configuration";
+  const music = musicConfiguration();
+  const controlls = controllsConfiguration();
+
+  modalContent.append(music, controlls);
+};
+
+export const createModalMultiPlayer = () => {
+  modal.style.display = "block";
+  modal.style.opacity = "1";
+  modal.style.pointerEvents = "auto";
+  modalTitle.innerHTML = "Multi Player";
+
+  let gameStarted = false;
+
+  const user = userContent();
+
+  let multijugador = document.createElement("section");
+  multijugador.style.display = "flex";
+  multijugador.style.flexDirection = "column";
+  multijugador.style.justifyContent = "center";
+  multijugador.style.width = "100%";
+  multijugador.style.alignItems = "center";
+  multijugador.style.height = "200px";
+  multijugador.style.marginTop = "2rem";
+
+  let crearSala = document.createElement("button");
+  let unirseSala = document.createElement("button");
+
+  
+
+  crearSala.innerHTML = "Create Room";
+  crearSala.classList.add("button");
+  unirseSala.innerHTML = "Join Room";
+  unirseSala.classList.add("button");
+
+  crearSala.addEventListener("click", async () => {
+    let room = createRoom(true)
+      multijugador.style.display = "none";
+
+      let contentRoom = document.createElement("div");
+      contentRoom.style.display = "flex";
+      contentRoom.style.justifyContent = "center";
+      contentRoom.style.alignItems = "center";
+      contentRoom.style.flexDirection = "column";
+      contentRoom.style.width = "auto";
+      contentRoom.style.padding = "1rem";
+
+      let titleCrear = document.createElement("h2");
+      titleCrear.innerHTML = "Room: " + room;
+      let gamers = document.createElement("p");
+      gamers.style.marginTop = "1rem";
+      gamers.style.color = "white";
+
+      initWebSocket(room);
+   
+      setInterval(() => {
+        console.log(dinoPosY)
+        fetch(`http://localhost:8080/clients/?room=${room}`)
+        .then((response) => response.json())
+        .then((data) => {
+          gamers.innerHTML = "Jugadores conectados: " + data.clientes
+        });
+      },1000)
 
 
-    let musicConfiguration = document.createElement("div")
-    musicConfiguration.classList.add("configuration");
+      let button = document.createElement('button');
+      button.innerHTML = "Play";
+      button.classList.add("button");
+      button.addEventListener('click', () => {
+        sendData({type: 'start', room: room});
+          if (!gameStarted) {
+              modal.style.display = "none";
+              Start();
+              gameStarted = true;
+              Loop();
+              rival();
+          }
+      });
 
+      contentRoom.append(titleCrear, gamers, button);
+      modalContent.append(contentRoom);
+  });
 
-    let titleMusic  = document.createElement("h2");
-    titleMusic.innerHTML = "Music Configuration";
-    titleMusic.style.color = "white"
-    titleMusic.style.marginBottom = "2rem"
+  unirseSala.addEventListener("click", () => {
+    let contentRoom = roomContent();
+    document.body.appendChild(contentRoom);
+});
 
-    
-    let checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.classList.add("checkbox");
-    checkbox.id = "music-config";
-    
-    
-    let label = document.createElement("label");
-    label.innerHTML = "On/Off Music";
-    label.classList.add("label");
-    label.setAttribute("for", "music-config");
-
-    let li = document.createElement("li");
-    li.style.listStyle = "none"
-    li.append( checkbox, label);
-
-    musicConfiguration.append(titleMusic,li);
-
-    let controlls = document.createElement("div")
-    controlls.classList.add("controlls");
-
-    let controllsTitle = document.createElement("h2");
-    controllsTitle.innerHTML = "Controlls";
-    controllsTitle.style.color = "white";
-    controllsTitle.style.marginBottom = "2rem"
-
-    let img = document.createElement("img");
-    img.style.width = "250px";
-    img.style.height = "120px";
-    img.src = "../src/img/controlesFlecha.png";
-    controlls.append(controllsTitle, img)
-
-    modalContent.innerHTML = ''; 
-    modalContent.append(musicConfiguration, controlls); 
-}
+  multijugador.append(user, crearSala, unirseSala);
+  modalContent.append(multijugador);
+};
