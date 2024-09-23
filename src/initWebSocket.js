@@ -1,11 +1,11 @@
+import { handleReceivedMessage } from "./components/roomContent.js";
+
 let ws;
-let salaTerminada = false;
+let mensajeRecibido = null; 
 
 
 export const initWebSocket = (room) => {
-   
-
-    ws = new WebSocket(`ws://localhost:8080/ws?room=${room}`);
+    ws = new WebSocket(`ws://44.223.173.166/ws?room=${room}`);
 
     ws.onopen = () => {
         console.log("Connected to WebSocket server");
@@ -14,6 +14,8 @@ export const initWebSocket = (room) => {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("Message received: ", data);
+        mensajeRecibido = data;
+        handleReceivedMessage(data); 
     };
 
     ws.onclose = () => {
@@ -25,6 +27,7 @@ export const initWebSocket = (room) => {
     };
 };
 
+// Envía datos solo si el WebSocket está abierto
 export const sendData = (data) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(data));
@@ -33,19 +36,8 @@ export const sendData = (data) => {
     }
 };
 
-export const messageReceived = () => {
-    let data 
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.onmessage = (event) => {
-           data = JSON.parse(event.data)
-            console.log("Message received: ", data);
-        }
-    } else {
-        console.error("WebSocket is not open. Cannot send data.");
-    }
-    return data
-}
 
+// Cerrar el WebSocket
 export const closeWebSocket = () => {
     if (ws) {
         ws.close();

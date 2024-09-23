@@ -335,10 +335,7 @@ export function rival() {
         requestAnimationFrame(moverRival);
     };
 
+    console.log(parado)
+
     moverRival();
 }
-
-
-// setInterval(() =>{
-//     sendData(dinoPosY)
-// },2000)

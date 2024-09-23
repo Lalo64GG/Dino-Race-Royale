@@ -2,7 +2,7 @@ import { musicConfiguration } from "./musicConfiguration.js";
 import { controllsConfiguration } from "./controllsConfiguration.js";
 import { userContent } from "./userContent.js";
 import { Loop, rival, Start } from "../gameLogic.js";
-import { initWebSocket, messageReceived, sendData } from "../initWebSocket.js";
+import { initWebSocket, sendData } from "../initWebSocket.js";
 import { createRoom } from "../createRoom.js";
 import { dinoPosY } from "../gameLogic.js";
 import { roomContent } from "./roomContent.js";
@@ -73,8 +73,7 @@ export const createModalMultiPlayer = () => {
       initWebSocket(room);
    
       setInterval(() => {
-        console.log(dinoPosY)
-        fetch(`http://localhost:8080/clients/?room=${room}`)
+        fetch(`http://44.223.173.166/clients/?room=${room}`)
         .then((response) => response.json())
         .then((data) => {
           gamers.innerHTML = "Jugadores conectados: " + data.clientes
@@ -83,6 +82,7 @@ export const createModalMultiPlayer = () => {
 
 
       let button = document.createElement('button');
+      sendData({type: 'position', data: dinoPosY})
       button.innerHTML = "Play";
       button.classList.add("button");
       button.addEventListener('click', () => {

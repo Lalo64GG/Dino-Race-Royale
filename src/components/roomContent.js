@@ -1,4 +1,7 @@
+import { Start, Loop, rival } from "../gameLogic.js";
 import { initWebSocket } from "../initWebSocket.js";
+
+let quitar = false
 
 export const roomContent = () => {
     let roomContentDiv = document.createElement("div");
@@ -50,18 +53,59 @@ export const roomContent = () => {
     joinButton.style.backgroundColor = "#0056b3";
     joinButton.style.margin = "1rem";
     joinButton.classList.add("button");
-  
+
     joinButton.addEventListener("click", () => {
-      if (roomInput.value === "") {
-        return;
-      }
-      const roomNumber = roomInput.value;
-      initWebSocket(roomNumber)
-      roomContentDiv.style.display = "none"
-    
+        if (roomInput.value === "") {
+            return;
+        }
+        const roomNumber = roomInput.value;
+        initWebSocket(roomNumber); // Inicializa el WebSocket
+        roomContentDiv.style.display = "none";
+        showLoadingScreen(); // Mostrar la pantalla de carga
     });
-  
+    
     roomContentDiv.append(titleRoomTitle, roomInput, joinButton);
     return roomContentDiv;
-  };
-  
+};
+
+export const showLoadingScreen = () => {
+    let loadingScreenDiv = document.createElement("div");
+    loadingScreenDiv.style.backgroundColor = "#FFFFFF";
+    loadingScreenDiv.style.display = "flex";
+    loadingScreenDiv.style.alignItems = "center";
+    loadingScreenDiv.style.justifyContent = "center";
+    loadingScreenDiv.style.flexDirection = "column";
+    loadingScreenDiv.style.height = "100vh";
+    loadingScreenDiv.style.width = "100vw";
+    loadingScreenDiv.style.position = "fixed";
+    loadingScreenDiv.style.top = "0";
+    loadingScreenDiv.style.left = "0";
+    loadingScreenDiv.style.zIndex = "10000000";
+
+    const loadingMessage = document.createElement("h2");
+    loadingMessage.innerHTML = "Esperando a que el host inicie la sala...";
+    loadingMessage.style.fontSize = "1.5rem";
+    loadingMessage.style.color = "#333";
+    modal.style.display= "none";
+    loadingScreenDiv.appendChild(loadingMessage);
+    document.body.appendChild(loadingScreenDiv);
+
+    let intervalId = setInterval(() => {
+        if (quitar) {
+            document.body.removeChild(loadingScreenDiv);
+            clearInterval(intervalId); // Detener la verificación
+        }
+    }, 100); // Cada 100ms verifica si `quitar` es true
+};
+
+
+
+
+export const handleReceivedMessage = (data) => {
+    if (data.type === 'start') {
+        quitar = true
+        Start();
+        Loop();
+        rival();
+    }
+}
