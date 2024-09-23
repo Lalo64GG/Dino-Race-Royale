@@ -35,7 +35,7 @@ let time = new Date();
 let deltaTime = 0;
 let highScore;
 
-if (localStorage.getItem("highscore") !== null) {
+if (localStorage.getItem("highscore") !== undefined) {
   highScore = localStorage.getItem("highScore");
 }
 
