@@ -73,7 +73,7 @@ export const createModalMultiPlayer = () => {
       initWebSocket(room);
    
       setInterval(() => {
-        fetch(`http://44.223.173.166/clients/?room=${room}`)
+        fetch(`https://dinoraceroyale.zapto.org/clients/?room=${room}`)
         .then((response) => response.json())
         .then((data) => {
           gamers.innerHTML = "Jugadores conectados: " + data.clientes

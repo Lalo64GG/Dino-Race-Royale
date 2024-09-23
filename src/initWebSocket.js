@@ -5,7 +5,7 @@ let mensajeRecibido = null;
 
 
 export const initWebSocket = (room) => {
-    ws = new WebSocket(`ws://44.223.173.166/ws?room=${room}`);
+    ws = new WebSocket(`wss://dinoraceroyale.zapto.org/ws?room=${room}`);
 
     ws.onopen = () => {
         console.log("Connected to WebSocket server");
